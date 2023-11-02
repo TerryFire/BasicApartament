@@ -1,60 +1,44 @@
-import json
 import csv
 
-
 class Resident:
+    # Клас представляє мешканця будинку
     def __init__(self, full_name, age, phone):
-        self.full_name = full_name
-        self.age = age
-        self.phone = phone
-        self.apartment = None
+        self.full_name = full_name  # Повне ім'я мешканця
+        self.age = age  # Вік мешканця
+        self.phone = phone  # Номер телефону мешканця
+        self.apartment = None  # Квартира, в якій проживає мешканець (по замовчуванню не заселений в жодну квартиру)
 
     def __str__(self):
         if self.apartment:
             return f"П.І.Б.: {self.full_name}, Вік: {self.age}, Телефон: {self.phone}, Проживає в квартирі {self.apartment.apartment_number}"
-        else:
-            return f"П.І.Б.: {self.full_name}, Вік: {self.age}, Телефон: {self.phone}, Не заселений в жодну квартиру"
-
-    def to_dict(self):
-        return {
-            "full_name": self.full_name,
-            "age": self.age,
-            "phone": self.phone,
-            "apartment": f'Не заселений в жодну квартиру' if self.apartment is None else self.apartment
-        }
+        return f"П.І.Б.: {self.full_name}, Вік: {self.age}, Телефон: {self.phone}, Не заселений в жодну квартиру"
 
 class Apartment:
+    # Клас представляє квартиру
     def __init__(self, apartment_number, floor, area, num_rooms):
-        self.apartment_number = apartment_number
-        self.floor = floor
-        self.area = area
-        self.num_rooms = num_rooms
-        self.residents = []
+        self.apartment_number = apartment_number  # Номер квартири
+        self.floor = floor  # Поверх, на якому розташована квартира
+        self.area = area  # Площа квартири
+        self.num_rooms = num_rooms  # Кількість кімнат
+        self.residents = []  # Список мешканців у квартирі
 
     def __str__(self):
         if self.residents:
             resident_names = [resident.full_name for resident in self.residents]
             return f"Номер квартири: {self.apartment_number}, Поверх: {self.floor}, Площа: {self.area}, Кількість кімнат: {self.num_rooms}, Заселені мешканці: {', '.join(resident_names)}"
-        else:
-            return f"Номер квартири: {self.apartment_number}, Поверх: {self.floor}, Площа: {self.area}, Кількість кімнат: {self.num_rooms}, Вільна"
-
-    def to_dict(self):
-        return {
-            "apartment_number": self.apartment_number,
-            "floor": self.floor,
-            "area": self.area,
-            "num_rooms": self.num_rooms,
-            "residents": [resident.full_name for resident in self.residents] if self.residents else 'Вільна'
-        }
+        return f"Номер квартири: {self.apartment_number}, Поверх: {self.floor}, Площа: {self.area}, Кількість кімнат: {self.num_rooms}, Вільна"
 
 class ResidentManager:
+    # Клас виконує функцію роботи зі списком мешканців
     def __init__(self):
-        self.residents = []
+        self.residents = []  # Список мешканців будинку
 
     def add_resident(self, resident):
+        # Додає мешканця до списку мешканців
         self.residents.append(resident)
 
     def remove_resident(self, resident):
+        # Видаляє мешканця зі списку мешканців
         if resident in self.residents:
             self.residents.remove(resident)
         else:
@@ -62,14 +46,17 @@ class ResidentManager:
 
 
 class ApartmentManager:
+    # Клас для роботи з об'єктами квартир
     def __init__(self):
-        self.apartments = []
+        self.apartments = []  # Список доступних квартир
 
     def add_apartment(self, apartment):
+        # Додає квартиру до списку доступних квартир
         self.apartments.append(apartment)
         print(f"Квартира {apartment.apartment_number} додана.")
 
     def remove_apartment(self, apartment_number):
+        # Видаляє квартиру за її номером
         for apartment in self.apartments:
             if apartment.apartment_number == apartment_number:
                 self.apartments.remove(apartment)
@@ -79,18 +66,24 @@ class ApartmentManager:
             print(f"Квартира {apartment_number} не знайдена.")
 
     def get_apartments_by_num_rooms(self, num_rooms):
+        # Повертає список квартир з вказаною кількістю кімнат
         return [apartment for apartment in self.apartments if apartment.num_rooms == num_rooms]
 
     def get_apartments_by_floor(self, floor):
+        # Повертає список квартир на вказаному поверсі
         return [apartment for apartment in self.apartments if apartment.floor == floor]
 
     def get_apartments_by_area(self, area):
+        # Повертає список квартир з вказаною площею
         return [apartment for apartment in self.apartments if apartment.area == area]
 
     def get_vacant_apartments(self):
-        return [apartment for apartment in self.apartments if apartment.resident is None]
+        # Повертає список вільних квартир (без мешканців)
+        return [apartment for apartment in self.apartments if not apartment.residents]
+
 
 class ResidentHandler:
+    # Клас виконує функції заселення\виселення
     def assign_resident_to_apartment(self, resident_manager, apartment_manager):
         full_name = input("Введіть П.І.Б. мешканця, якого ви хочете заселити: ")
         apartment_number = input("Введіть номер квартири, в яку заселити: ")
@@ -120,28 +113,32 @@ class ResidentHandler:
         print("Мешканця не знайдено або він не проживає в квартирі.")
 
 
-
 class Reports:
     def generate_full_residents_report(self, residents):
+        # Генерує звіт про всіх мешканців
         report = "Звіт про мешканців:\n"
         for resident in residents:
             report += str(resident) + "\n"
         return report
 
     def generate_full_apartments_report(self, apartments):
+        # Генерує звіт про всі квартири
         report = "Звіт про квартири:\n"
         for apartment in apartments:
             report += str(apartment) + "\n"
         return report
 
+
 class Storage:
+    # Клас для роботи з системою загрузки даних
     def __init__(self, residents_data_file, apartments_data_file, resident_manager, apartment_manager):
-        self.residents_data_file = residents_data_file
-        self.apartments_data_file = apartments_data_file
-        self.resident_manager = resident_manager
-        self.apartment_manager = apartment_manager
+        self.residents_data_file = residents_data_file  # Ім'я файлу для збереження даних про мешканців
+        self.apartments_data_file = apartments_data_file  # Ім'я файлу для збереження даних про квартири
+        self.resident_manager = resident_manager  # Менеджер мешканців
+        self.apartment_manager = apartment_manager  # Менеджер квартир
 
     def save_residents(self, residents):
+        # Зберігає дані про мешканців у файл
         try:
             with open(self.residents_data_file, mode='w', newline='') as file:
                 writer = csv.writer(file)
@@ -157,6 +154,7 @@ class Storage:
             print(f"Помилка збереження даних про мешканців: {e}")
 
     def load_residents(self):
+        # Завантажує дані про мешканців з файлу
         try:
             with open(self.residents_data_file, mode='r') as file:
                 reader = csv.reader(file)
@@ -166,7 +164,9 @@ class Storage:
                     full_name, age, phone, apartment_number = row
                     residents.append(Resident(full_name, int(age), phone))
                     if apartment_number:
-                        apartment = next((a for a in self.apartment_manager.apartments if a.apartment_number == apartment_number), None)
+                        apartment = next(
+                            (a for a in self.apartment_manager.apartments if a.apartment_number == apartment_number),
+                            None)
                         if apartment:
                             residents[-1].apartment = apartment
                 return residents
@@ -179,6 +179,7 @@ class Storage:
             return []
 
     def save_apartments(self, apartments):
+        # Зберігає дані про квартири у файл
         try:
             with open(self.apartments_data_file, mode='w', newline='') as file:
                 writer = csv.writer(file)
@@ -191,6 +192,7 @@ class Storage:
             print(f"Помилка збереження даних про квартири: {e}")
 
     def load_apartments(self):
+        # Завантажує дані про квартири з файлу
         try:
             with open(self.apartments_data_file, mode='r') as file:
                 reader = csv.reader(file)
@@ -384,9 +386,10 @@ class UserInterface:
                 print("Невірний вибір. Спробуйте ще раз.")
 
 
+residents_data_file = "residents_data.csv"
+apartments_data_file = "apartments_data.csv"
+
 if __name__ == "__main__":
-    residents_data_file = "residents_data.csv"
-    apartments_data_file = "apartments_data.csv"
 
     resident_manager = ResidentManager()
     apartment_manager = ApartmentManager()
